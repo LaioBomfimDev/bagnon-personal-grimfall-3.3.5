@@ -160,6 +160,14 @@ function ItemFrame:HandleSpecificItemEvent(msg, bag, slot, ...)
 		local item = self:GetItemSlot(bag, slot)
 		if item then
 			item:HandleEvent(msg, bag, slot, ...)
+			-- Level Group's grouping depends on item content, not just which
+			-- slots exist, so a same-slot content swap (e.g. the sort button
+			-- moving items between already-existing slots) needs a full
+			-- re-layout too, unlike the stock layouts which only care about
+			-- slot identity.
+			if self:IsLevelGroupEnabled() then
+				self:RequestLayout()
+			end
 		end
 	end
 end
@@ -360,10 +368,23 @@ end
 function ItemFrame:Layout()
 	if self:IsLevelGroupEnabled() then
 		self:Layout_Level()
-	elseif self:IsBagBreakEnabled() then
-		self:Layout_BagBreak()
 	else
-		self:Layout_Default()
+		-- Layout_Level's headers are only ever hidden by Layout_Level itself,
+		-- so switching back to a stock layout left them stuck on screen.
+		self:HideLevelHeaders()
+		if self:IsBagBreakEnabled() then
+			self:Layout_BagBreak()
+		else
+			self:Layout_Default()
+		end
+	end
+end
+
+function ItemFrame:HideLevelHeaders()
+	if self.levelHeaders then
+		for i = 1, #self.levelHeaders do
+			self.levelHeaders[i]:Hide()
+		end
 	end
 end
 

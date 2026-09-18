@@ -445,12 +445,6 @@ function Frame:Layout()
 	width = width + w + 24 --append spacing between close button and this
 	height = height + 20
 
-	local w, h = self:PlaceLevelToggle()
-	width = width + w
-
-	local w, h = self:PlaceTypeFilterToggle()
-	width = width + w
-
 	local w, h = self:PlaceTitleFrame()
 	width = width + w
 
@@ -511,6 +505,14 @@ function Frame:PlaceMenuButtons()
 	if self:HasSearchToggle() then
 		local toggle = self:GetSearchToggle() or self:CreateSearchToggle()
 		table.insert(menuButtons, toggle)
+	end
+
+	if self:HasLevelToggle() then
+		table.insert(menuButtons, self:GetLevelToggle() or self:CreateLevelToggle())
+	end
+
+	if self:HasTypeFilterToggle() then
+		table.insert(menuButtons, self:GetTypeFilterToggle() or self:CreateTypeFilterToggle())
 	end
 
 	for i, button in ipairs(menuButtons) do
@@ -593,11 +595,7 @@ function Frame:PlaceSearchFrame()
 		frame:SetPoint('TOPLEFT', self, 'TOPLEFT', 8, -8)
 	end
 
-	if self:HasTypeFilterToggle() then
-		frame:SetPoint('RIGHT', self:GetTypeFilterToggle(), 'LEFT', -2, 0)
-	elseif self:HasLevelToggle() then
-		frame:SetPoint('RIGHT', self:GetLevelToggle(), 'LEFT', -2, 0)
-	elseif self:HasOptionsToggle() then
+	if self:HasOptionsToggle() then
 		frame:SetPoint('RIGHT', self:GetOptionsToggle(), 'LEFT', -2, 0)
 	else
 		frame:SetPoint('RIGHT', self:GetCloseButton(), 'LEFT', -2, 0)
@@ -738,11 +736,7 @@ function Frame:PlaceTitleFrame()
 		h = 20
 	end
 
-	if self:HasTypeFilterToggle() then
-		frame:SetPoint('RIGHT', self:GetTypeFilterToggle(), 'LEFT', -4, 0)
-	elseif self:HasLevelToggle() then
-		frame:SetPoint('RIGHT', self:GetLevelToggle(), 'LEFT', -4, 0)
-	elseif self:HasOptionsToggle() then
+	if self:HasOptionsToggle() then
 		frame:SetPoint('RIGHT', self:GetOptionsToggle(), 'LEFT', -4, 0)
 	else
 		frame:SetPoint('RIGHT', self:GetCloseButton(), 'LEFT', -4, 0)
@@ -927,28 +921,6 @@ function Frame:HasLevelToggle()
 	return true
 end
 
-function Frame:PlaceLevelToggle()
-	if self:HasLevelToggle() then
-		local toggle = self:GetLevelToggle() or self:CreateLevelToggle()
-		toggle:ClearAllPoints()
-
-		if self:HasOptionsToggle() then
-			toggle:SetPoint('RIGHT', self:GetOptionsToggle(), 'LEFT', -4, 0)
-		else
-			toggle:SetPoint('RIGHT', self:GetCloseButton(), 'LEFT', -4, 0)
-		end
-
-		toggle:Show()
-		return toggle:GetWidth(), toggle:GetHeight()
-	end
-
-	local toggle = self:GetLevelToggle()
-	if toggle then
-		toggle:Hide()
-	end
-	return 0, 0
-end
-
 
 --[[ type filter toggle ]]--
 
@@ -964,30 +936,6 @@ end
 
 function Frame:HasTypeFilterToggle()
 	return true
-end
-
-function Frame:PlaceTypeFilterToggle()
-	if self:HasTypeFilterToggle() then
-		local toggle = self:GetTypeFilterToggle() or self:CreateTypeFilterToggle()
-		toggle:ClearAllPoints()
-
-		if self:HasLevelToggle() then
-			toggle:SetPoint('RIGHT', self:GetLevelToggle(), 'LEFT', -4, 0)
-		elseif self:HasOptionsToggle() then
-			toggle:SetPoint('RIGHT', self:GetOptionsToggle(), 'LEFT', -4, 0)
-		else
-			toggle:SetPoint('RIGHT', self:GetCloseButton(), 'LEFT', -4, 0)
-		end
-
-		toggle:Show()
-		return toggle:GetWidth(), toggle:GetHeight()
-	end
-
-	local toggle = self:GetTypeFilterToggle()
-	if toggle then
-		toggle:Hide()
-	end
-	return 0, 0
 end
 
 
