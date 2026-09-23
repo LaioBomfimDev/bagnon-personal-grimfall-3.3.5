@@ -343,7 +343,7 @@ end
 
 --required-to-use level (blank for items with no level requirement)
 function ItemSlot:SetLevel(link)
-	local minLevel = link and select(5, GetItemInfo(link))
+	local minLevel = link and Bagnon.Sorting.GetRequiredLevel(link)
 	if minLevel and minLevel > 0 then
 		self.levelText:SetText(minLevel)
 		self.levelText:Show()

@@ -38,6 +38,48 @@ function Sort.LevelBand(minLevel)
 end
 
 
+--[[ Required level, with a tooltip-text fallback ]]--
+--On Grimfall, some dungeon-scaled items keep the wrong "requires level" in
+--their static item template (what GetItemInfo reads, cached client-side and
+--not fixed by a client restart) while the tooltip - written per-drop by the
+--server - shows the real scaled level. Whenever the tooltip actually states
+--a level, trust that over GetItemInfo. Results are cached per exact link,
+--since scanning a tooltip for every slot on every layout pass is expensive.
+
+local reqLevelPattern = ITEM_MIN_LEVEL and ITEM_MIN_LEVEL:gsub('%%d', '(%%d+)')
+local reqLevelCache = {}
+local reqLevelScanTip
+
+function Sort.GetRequiredLevel(link)
+  if not link then return 0 end
+
+  local cached = reqLevelCache[link]
+  if cached then return cached end
+
+  local level = select(5, GetItemInfo(link)) or 0
+
+  if reqLevelPattern then
+    reqLevelScanTip = reqLevelScanTip or CreateFrame('GameTooltip', 'BagnonReqLevelScanTip', nil, 'GameTooltipTemplate')
+    reqLevelScanTip:SetOwner(UIParent, 'ANCHOR_NONE')
+    reqLevelScanTip:ClearLines()
+    reqLevelScanTip:SetHyperlink(link)
+
+    for i = 1, reqLevelScanTip:NumLines() do
+      local line = _G['BagnonReqLevelScanTipTextLeft' .. i]
+      local text = line and line:GetText()
+      local scanned = text and text:match(reqLevelPattern)
+      if scanned then
+        level = tonumber(scanned)
+        break
+      end
+    end
+  end
+
+  reqLevelCache[link] = level
+  return level
+end
+
+
 --[[ Equipment type filter ]]--
 --Armor subtype comes straight from GetItemInfo; "weapon 1H/2H" is derived
 --from the equip slot, since that's not a single subtype in the game data.
@@ -201,8 +243,8 @@ function Sort:GetSpaces()
         item.quality = quality
         item.icon = texture
         item.level = itemLevel
-        item.minLevel = itemMinLevel or 0
-        item.levelBand = Sort.LevelBand(itemMinLevel)
+        item.minLevel = Sort.GetRequiredLevel(link)
+        item.levelBand = Sort.LevelBand(item.minLevel)
         item.name = itemName
       end
 		end

@@ -489,9 +489,10 @@ function ItemFrame:Layout_Level()
 						itemSlot:Hide()
 					else
 						itemSlot:Show()
-						local name, _, _, _, minLevel = GetItemInfo(link)
+						local name = GetItemInfo(link)
+						local minLevel = Bagnon.Sorting.GetRequiredLevel(link)
 						local list = groups[LevelBand(minLevel)]
-						list[#list + 1] = {itemSlot = itemSlot, minLevel = minLevel or 0, name = name or ''}
+						list[#list + 1] = {itemSlot = itemSlot, minLevel = minLevel, name = name or ''}
 					end
 				else
 					itemSlot:Show()

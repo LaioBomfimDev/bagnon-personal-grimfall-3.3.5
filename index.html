@@ -285,6 +285,61 @@
     padding-top: 24px;
   }
 
+  .changelog {
+    display: grid;
+    gap: 22px;
+  }
+
+  .version {
+    position: relative;
+    padding-left: 22px;
+    border-left: 2px solid var(--border);
+    padding-bottom: 2px;
+  }
+
+  .version:last-child { border-left-color: transparent; }
+
+  .version::before {
+    content: '';
+    position: absolute;
+    left: -5px;
+    top: 3px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 0 3px var(--bg);
+  }
+
+  .version-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+
+  .version-tag {
+    font-family: var(--font-display);
+    color: var(--gold);
+    font-size: 15px;
+  }
+
+  .version-title {
+    color: var(--text);
+    font-weight: 600;
+    font-size: 14.5px;
+  }
+
+  .version ul {
+    margin: 0;
+    padding-left: 18px;
+    color: var(--text-muted);
+    font-size: 14px;
+    display: grid;
+    gap: 5px;
+  }
+
   @media (max-width: 480px) {
     .acc-body { padding-left: 16px; }
   }
@@ -392,6 +447,43 @@
       </div>
     </section>
 
+    <section>
+      <h2 class="rise" style="animation-delay:.46s">Version history</h2>
+      <div class="changelog rise" style="animation-delay:.48s">
+        <div class="version">
+          <div class="version-head"><span class="version-tag">v1.0</span><span class="version-title">Base fix + Level Group</span></div>
+          <ul>
+            <li>Fixed stock Bagnon so it actually loads and runs on Grimfall's 3.3.5a client.</li>
+            <li>Added the Level Group layout: bags and bank grouped into level bands (1-9 up to 60+).</li>
+            <li>Added the required level shown on each item icon.</li>
+            <li>Added a one-click toggle between the normal Bagnon view and Level Group.</li>
+          </ul>
+        </div>
+        <div class="version">
+          <div class="version-head"><span class="version-tag">v1.1</span><span class="version-title">Equipment type filter</span></div>
+          <ul>
+            <li>Added a filter (Cloth / Leather / Mail / Plate / Weapon 1H / Weapon 2H) to narrow the Level Group view to one gear type at a time.</li>
+          </ul>
+        </div>
+        <div class="version">
+          <div class="version-head"><span class="version-tag">v1.2</span><span class="version-title">Bug fixes + full addon suite</span></div>
+          <ul>
+            <li>Found: switching back to the normal view left the level band headers stuck on screen. Fixed.</li>
+            <li>Found: sorting while in Level Group view left items looking randomly placed until the bag was closed and reopened. Fixed &mdash; the grouped view now updates in real time as items move.</li>
+            <li>Found: bag-skinning addons like DragonUI redraw the top-right corner, hiding our buttons there. Fixed &mdash; both buttons moved into the left button row instead.</li>
+            <li>Added the full companion addon suite to the download: Config, GuildBank, Tooltips, VoidStorage, Forever.</li>
+          </ul>
+        </div>
+        <div class="version">
+          <div class="version-head"><span class="version-tag">v1.3</span><span class="version-title">Dungeon-scaled item levels</span></div>
+          <ul>
+            <li>Found: some dungeon-scaled items (the same item, dropped at a different level) showed in the wrong level band &mdash; their static item data stayed wrong even after a full client restart.</li>
+            <li>Fixed: now reads the real required level from the tooltip text itself when the game's stored item data disagrees with it.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
     <div class="credits rise" style="animation-delay:.44s">
       All credit to Tuller and the Bagnon team for the original addon &mdash; this is just a small layer on top, adapted for Grimfall's 3.3.5a client.
     </div>
@@ -477,6 +569,43 @@
           <div class="acc-collapse"><div class="acc-collapse-inner"><div class="acc-body">
             Os dois botões de alternância ficam na mesma fileira esquerda dos botões de organizar/busca, em vez do canto superior direito. Addons de skin como o DragonUI redesenham esse canto, o que escondia os botões antes.
           </div></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="rise" style="animation-delay:.46s">Histórico de versões</h2>
+      <div class="changelog rise" style="animation-delay:.48s">
+        <div class="version">
+          <div class="version-head"><span class="version-tag">v1.0</span><span class="version-title">Correção base + Level Group</span></div>
+          <ul>
+            <li>Corrigido o Bagnon original pra carregar e funcionar de verdade no cliente 3.3.5a do Grimfall.</li>
+            <li>Adicionado o modo Level Group: bolsas e banco agrupados em faixas de nível (1-9 até 60+).</li>
+            <li>Adicionado o nível necessário mostrado em cada ícone de item.</li>
+            <li>Adicionado um botão pra alternar entre a visão normal do Bagnon e o Level Group.</li>
+          </ul>
+        </div>
+        <div class="version">
+          <div class="version-head"><span class="version-tag">v1.1</span><span class="version-title">Filtro por tipo de equipamento</span></div>
+          <ul>
+            <li>Adicionado um filtro (Cloth / Leather / Mail / Plate / Weapon 1H / Weapon 2H) pra reduzir a visão por nível a um tipo de equipamento por vez.</li>
+          </ul>
+        </div>
+        <div class="version">
+          <div class="version-head"><span class="version-tag">v1.2</span><span class="version-title">Correções de bugs + suíte completa</span></div>
+          <ul>
+            <li>Encontrado: voltar pra visão normal deixava os cabeçalhos de faixa de nível presos na tela. Corrigido.</li>
+            <li>Encontrado: organizar enquanto estava no modo Level Group deixava os itens parecendo colocados aleatoriamente até fechar e abrir a bolsa de novo. Corrigido &mdash; a visão agrupada agora atualiza em tempo real conforme os itens se movem.</li>
+            <li>Encontrado: addons que "repintam" a bolsa, como o DragonUI, redesenham o canto superior direito e escondiam nossos botões ali. Corrigido &mdash; os dois botões foram movidos pra fileira esquerda.</li>
+            <li>Adicionada a suíte completa de addons satélites ao download: Config, GuildBank, Tooltips, VoidStorage, Forever.</li>
+          </ul>
+        </div>
+        <div class="version">
+          <div class="version-head"><span class="version-tag">v1.3</span><span class="version-title">Nível de itens escalados de dungeon</span></div>
+          <ul>
+            <li>Encontrado: alguns itens escalados de dungeon (o mesmo item, dropado em nível diferente) apareciam na faixa de nível errada &mdash; o dado estático do item ficava errado mesmo depois de reiniciar o cliente por completo.</li>
+            <li>Corrigido: agora lê o nível necessário real direto do texto do tooltip quando o dado guardado pelo jogo não bate com ele.</li>
+          </ul>
         </div>
       </div>
     </section>
