@@ -27,6 +27,8 @@ A small adaptation of the classic **Bagnon** (originally by Tuller) so it runs c
 
 - `/bagnon` or `/bgn` — open the bag window (see all commands with `/bagnon ?`).
 - `/bagnon level` — toggle Level Group grouping for both bags and bank.
+- `/bagnon badge` — show/hide the required level number on item icons (also in the options: `/bagnon`).
+- `/bagnon debug` — print a short diagnostic (use it when reporting a problem).
 - The title bar of the bag/bank window has two extra buttons: one toggles Level Group, the other opens the equipment type filter menu.
 
 ## Version history
@@ -46,6 +48,10 @@ A small adaptation of the classic **Bagnon** (originally by Tuller) so it runs c
 - **v1.3 — Dungeon-scaled item levels**
   - Found: some dungeon-scaled items (the same item, dropped at a different level) showed in the wrong level band — their static item data stayed wrong even after a full client restart.
   - Fixed: now reads the real required level from the tooltip text itself when the game's stored item data disagrees with it.
+- **v1.4 — Level badge toggle + combat safety**
+  - Requested: a way to hide the required-level number drawn on every item icon. Added: a new option, *Show required level on item icons*, in the addon options (`/bagnon`) — or flip it with `/bagnon badge`. On by default.
+  - Reported: bags not opening during combat. The exact cause is not confirmed yet, so this is a safety net: Bagnon now builds its own item buttons instead of borrowing the default bag ones, and if the game refuses to show the window mid-fight, the default bags open instead of nothing happening.
+  - Added `/bagnon debug` — prints a short diagnostic to help pin down the combat problem if it still happens.
 
 ## Credit
 

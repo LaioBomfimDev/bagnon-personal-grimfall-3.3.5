@@ -52,6 +52,7 @@ function GeneralOptions:UpdateMessages()
 	end
 
 	self:RegisterMessage('SHOW_EMPTY_ITEM_SLOT_TEXTURE_UPDATE')
+	self:RegisterMessage('ITEM_LEVEL_BADGE_UPDATE')
 	self:RegisterMessage('LOCK_FRAME_POSITIONS_UPDATE')
 	self:RegisterMessage('ENABLE_FRAME_UPDATE')
 	self:RegisterMessage('BLIZZARD_BAG_PASSTHROUGH_UPDATE')
@@ -59,6 +60,10 @@ end
 
 function GeneralOptions:SHOW_EMPTY_ITEM_SLOT_TEXTURE_UPDATE(msg, enable)
 	self:GetEmptyItemSlotTextureCheckbox():UpdateChecked()
+end
+
+function GeneralOptions:ITEM_LEVEL_BADGE_UPDATE(msg, enable)
+	self:GetLevelBadgeCheckbox():UpdateChecked()
 end
 
 function GeneralOptions:LOCK_FRAME_POSITIONS_UPDATE(msg, enable)
@@ -97,6 +102,9 @@ function GeneralOptions:AddWidgets()
 	
 	local enableBlizzardBagPassThrough = self:CreateBlizzardBagPassThroughCheckbox()
 	enableBlizzardBagPassThrough:SetPoint('TOPLEFT', showEmptyItemSlotTextures, 'BOTTOMLEFT', 0, -SPACING)
+	
+	local showLevelBadge = self:CreateLevelBadgeCheckbox()
+	showLevelBadge:SetPoint('TOPLEFT', enableBlizzardBagPassThrough, 'BOTTOMLEFT', 0, -SPACING)
 end
 
 function GeneralOptions:UpdateWidgets()
@@ -172,6 +180,27 @@ end
 
 function GeneralOptions:GetEmptyItemSlotTextureCheckbox()
 	return self.showEmptyItemsTextureCheckbox
+end
+
+
+--show required level on item icons
+function GeneralOptions:CreateLevelBadgeCheckbox()
+	local button = Bagnon.OptionsCheckButton:New(L.ShowLevelBadge, self)
+
+	button.OnEnableSetting = function(self, enable)
+		Bagnon.Settings:SetShowLevelBadge(enable)
+	end
+
+	button.IsSettingEnabled = function(self)
+		return Bagnon.Settings:ShowingLevelBadge()
+	end
+
+	self.levelBadgeCheckbox = button
+	return button
+end
+
+function GeneralOptions:GetLevelBadgeCheckbox()
+	return self.levelBadgeCheckbox
 end
 
 

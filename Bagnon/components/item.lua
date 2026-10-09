@@ -99,8 +99,11 @@ function ItemSlot:GetBlizzardItemSlot(id)
 	end
 end
 
+--Bagnon builds its own item buttons instead of borrowing Blizzard's. Borrowed
+--buttons are reparented into Bagnon's windows, which leaves the default bags
+--without item buttons and makes them useless as a fallback in combat.
 function ItemSlot:CanReuseBlizzardBagSlots()
-	return Bagnon.Settings:AreAllFramesEnabled() and (not Bagnon.Settings:IsBlizzardBagPassThroughEnabled())
+	return false
 end
 
 --returns the next available item slot
@@ -171,6 +174,10 @@ end
 
 function ItemSlot:ITEM_HIGHLIGHT_OPACITY_UPDATE(msg, opacity)
 	self:UpdateBorder()
+end
+
+function ItemSlot:ITEM_LEVEL_BADGE_UPDATE(msg, enable)
+	self:Update()
 end
 
 function ItemSlot:SHOW_EMPTY_ITEM_SLOT_TEXTURE_UPDATE(msg, enable)
@@ -343,7 +350,7 @@ end
 
 --required-to-use level (blank for items with no level requirement)
 function ItemSlot:SetLevel(link)
-	local minLevel = link and Bagnon.Sorting.GetRequiredLevel(link)
+	local minLevel = link and Bagnon.Settings:ShowingLevelBadge() and Bagnon.Sorting.GetRequiredLevel(link)
 	if minLevel and minLevel > 0 then
 		self.levelText:SetText(minLevel)
 		self.levelText:Show()

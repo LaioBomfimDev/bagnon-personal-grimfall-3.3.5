@@ -481,6 +481,14 @@
             <li>Fixed: now reads the real required level from the tooltip text itself when the game's stored item data disagrees with it.</li>
           </ul>
         </div>
+        <div class="version">
+          <div class="version-head"><span class="version-tag">v1.4</span><span class="version-title">Level badge toggle + combat safety</span></div>
+          <ul>
+            <li>Requested: a way to hide the required-level number drawn on every item icon. Added: a new option, <em>Show required level on item icons</em>, in the addon options (type <code>/bagnon</code>) &mdash; or flip it on the fly with <code>/bagnon badge</code>. On by default.</li>
+            <li>Reported: bags not opening during combat. The exact cause is not confirmed yet, so this is a safety net: Bagnon now builds its own item buttons instead of borrowing the default bag ones, and if the game refuses to show the window mid-fight, the default bags open instead of nothing happening.</li>
+            <li>Added <code>/bagnon debug</code> &mdash; prints a short diagnostic so we can pin down the combat problem if it still happens for you.</li>
+          </ul>
+        </div>
       </div>
     </section>
 
@@ -605,6 +613,14 @@
           <ul>
             <li>Encontrado: alguns itens escalados de dungeon (o mesmo item, dropado em nível diferente) apareciam na faixa de nível errada &mdash; o dado estático do item ficava errado mesmo depois de reiniciar o cliente por completo.</li>
             <li>Corrigido: agora lê o nível necessário real direto do texto do tooltip quando o dado guardado pelo jogo não bate com ele.</li>
+          </ul>
+        </div>
+        <div class="version">
+          <div class="version-head"><span class="version-tag">v1.4</span><span class="version-title">Opção do número de nível + segurança em combate</span></div>
+          <ul>
+            <li>Pedido: um jeito de esconder o número do nível necessário desenhado em cada ícone de item. Adicionado: uma nova opção, <em>Show required level on item icons</em>, nas opções do addon (digite <code>/bagnon</code>) &mdash; ou alterne na hora com <code>/bagnon badge</code>. Ligada por padrão.</li>
+            <li>Reportado: bolsas não abrindo durante o combate. A causa exata ainda não foi confirmada, então isto é uma rede de segurança: o Bagnon agora cria os próprios botões de item em vez de pegar emprestados os da bolsa padrão, e se o jogo se recusar a mostrar a janela no meio da luta, a bolsa padrão abre em vez de nada acontecer.</li>
+            <li>Adicionado <code>/bagnon debug</code> &mdash; mostra um diagnóstico curto pra podermos achar o problema de combate caso ele ainda aconteça com você.</li>
           </ul>
         </div>
       </div>

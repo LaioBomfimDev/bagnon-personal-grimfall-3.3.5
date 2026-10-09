@@ -68,6 +68,7 @@ function SavedSettings:GetDefaultSettings()
 		showEmptyItemSlotTexture = true,
 		lockFramePositions = false,
 		colorBagSlots = true,
+		showLevelBadge = true,
 		
 		enableBlizzardBagPassThrough = false,
 		

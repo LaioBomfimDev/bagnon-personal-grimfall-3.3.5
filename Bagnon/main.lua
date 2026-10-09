@@ -25,6 +25,7 @@ function Bagnon:OnInitialize()
 	self.frames = {}
 
 	self:HookBagClickEvents()
+	self:WatchBlockedActions()
 	self:RegisterAutoDisplayEvents()
 	self:AddSlashCommands()
 	self:CreateOptionsLoader()
@@ -159,7 +160,7 @@ function Bagnon:HookBagClickEvents()
 
 	local oOpenBackpack = OpenBackpack
 	OpenBackpack = function()
-		local shown = self:FrameControlsBag('inventory', BACKPACK_CONTAINER) and self:ShowFrame('inventory')
+		local shown = self:FrameControlsBag('inventory', BACKPACK_CONTAINER) and self:RequestFrame('inventory', 'ShowFrame')
 
 		if not shown then
 			oOpenBackpack()
@@ -168,7 +169,7 @@ function Bagnon:HookBagClickEvents()
 
 	local oToggleBackpack = ToggleBackpack
 	ToggleBackpack = function()
-		local toggled = self:FrameControlsBag('inventory', BACKPACK_CONTAINER) and self:ToggleFrame('inventory')
+		local toggled = self:FrameControlsBag('inventory', BACKPACK_CONTAINER) and self:RequestFrame('inventory', 'ToggleFrame')
 
 		if not toggled then
 			oToggleBackpack()
@@ -179,7 +180,7 @@ function Bagnon:HookBagClickEvents()
 	local oToggleBag = ToggleBag
 	ToggleBag = function(bagSlot)
 		local frameID = self.BagSlotInfo:IsBankBag(bagSlot) and 'bank' or 'inventory'
-		local toggled = self:FrameControlsBag(frameID, bagSlot) and self:ToggleFrame(frameID)
+		local toggled = self:FrameControlsBag(frameID, bagSlot) and self:RequestFrame(frameID, 'ToggleFrame')
 
 		if not toggled then
 			oToggleBag(bagSlot)
@@ -189,10 +190,10 @@ function Bagnon:HookBagClickEvents()
 	--keyring
 	local oToggleKeyRing = ToggleKeyRing
 	ToggleKeyRing = function()
-		local toggled = self:FrameControlsBag('keys', KEYRING_CONTAINER) and self:ToggleFrame('keys')
+		local toggled = self:FrameControlsBag('keys', KEYRING_CONTAINER) and self:RequestFrame('keys', 'ToggleFrame')
 
 		if not toggled then
-			toggled = self:FrameControlsBag('inventory', KEYRING_CONTAINER) and self:ToggleFrame('inventory')
+			toggled = self:FrameControlsBag('inventory', KEYRING_CONTAINER) and self:RequestFrame('inventory', 'ToggleFrame')
 		end
 
 		if not toggled then
@@ -210,9 +211,9 @@ function Bagnon:HookBagClickEvents()
 	OpenAllBags = function(force)
 		local opened = false
 		if force then
-			opened = self:FrameControlsBag('inventory', BACKPACK_CONTAINER) and self:ShowFrame('inventory')
+			opened = self:FrameControlsBag('inventory', BACKPACK_CONTAINER) and self:RequestFrame('inventory', 'ShowFrame')
 		else
-			opened = self:FrameControlsBag('inventory', BACKPACK_CONTAINER) and self:ToggleFrame('inventory')
+			opened = self:FrameControlsBag('inventory', BACKPACK_CONTAINER) and self:RequestFrame('inventory', 'ToggleFrame')
 		end
 
 		if not opened then
@@ -221,6 +222,74 @@ function Bagnon:HookBagClickEvents()
 	end
 end
 
+
+--[[
+	Combat Safety
+--]]
+
+--is the frame really on screen? (the settings object only counts requests)
+function Bagnon:IsFrameOnScreen(frameID)
+	local frame = self:GetFrame(frameID)
+	return frame and frame:IsShown() and true or false
+end
+
+--runs ShowFrame / ToggleFrame. In combat the game refuses to show or hide
+--protected frames, so if the window did not react, resync the settings and
+--report failure so the caller can hand the request to the default bags.
+function Bagnon:RequestFrame(frameID, method)
+	local wasShown = self:IsFrameOnScreen(frameID)
+	local handled = self[method](self, frameID)
+
+	if handled and InCombatLockdown() then
+		local isShown = self:IsFrameOnScreen(frameID)
+		local wanted = (method == 'ShowFrame') or (not wasShown)
+
+		if isShown ~= wanted then
+			self.FrameSettings:Get(frameID).shown = isShown and 1 or 0
+			self.combatFallbacks = (self.combatFallbacks or 0) + 1
+			return false
+		end
+	end
+	return handled
+end
+
+--remember (and tell the player about) actions the game blocked for Bagnon
+function Bagnon:WatchBlockedActions()
+	self:RegisterEvent('ADDON_ACTION_BLOCKED', 'OnActionBlocked')
+	self:RegisterEvent('ADDON_ACTION_FORBIDDEN', 'OnActionBlocked')
+	self:RegisterEvent('PLAYER_REGEN_ENABLED', 'OnLeaveCombat')
+end
+
+function Bagnon:OnActionBlocked(event, addon, func)
+	if type(addon) ~= 'string' or not addon:find('^Bagnon') then return end
+
+	self.blockedCount = (self.blockedCount or 0) + 1
+	self.lastBlocked = addon .. ': ' .. tostring(func)
+
+	if not self.reportedBlock then
+		self.reportedBlock = true
+		self:Print('The game blocked an action in combat (' .. tostring(func) .. '). Type /bagnon debug and report the result.')
+	end
+end
+
+function Bagnon:OnLeaveCombat()
+	self.reportedBlock = nil
+end
+
+function Bagnon:PrintDebug()
+	self:Print('debug (' .. (InCombatLockdown() and 'in combat' or 'out of combat') .. ')')
+	for _, frameID in ipairs({'inventory', 'bank', 'keys'}) do
+		local frame = self:GetFrame(frameID)
+		if frame then
+			local protected, explicit = frame:IsProtected()
+			print(string.format(' - %s: shown=%s, protected=%s, explicit=%s', frameID, tostring(frame:IsShown()), tostring(protected), tostring(explicit)))
+		else
+			print(string.format(' - %s: not created yet', frameID))
+		end
+	end
+	print(string.format(' - blocked actions: %d (last: %s)', self.blockedCount or 0, self.lastBlocked or 'none'))
+	print(string.format(' - combat fallbacks to default bags: %d', self.combatFallbacks or 0))
+end
 
 --[[
 	Automatic Display
@@ -372,6 +441,10 @@ function Bagnon:HandleSlashCommand(cmd)
 		self:ToggleFrame('keys')
 	elseif cmd == 'level' then
 		self:ToggleLevelGroup()
+	elseif cmd == 'badge' or cmd == 'levelbadge' then
+		self:ToggleLevelBadge()
+	elseif cmd == 'debug' then
+		self:PrintDebug()
 	elseif cmd == 'version' then
 		self:PrintVersion()
 	elseif cmd == 'config' then
@@ -400,6 +473,13 @@ function Bagnon:ToggleLevelGroup()
 	self:Print('Level grouping: ' .. (enable and 'on' or 'off'))
 end
 
+--shows/hides the required-level number drawn on each item icon
+function Bagnon:ToggleLevelBadge()
+	local enable = not self.Settings:ShowingLevelBadge()
+	self.Settings:SetShowLevelBadge(enable)
+	self:Print('Level badge on item icons: ' .. (enable and 'on' or 'off'))
+end
+
 function Bagnon:PrintHelp()
 	local function PrintCmd(cmd, desc)
 		print(string.format(' - |cFF33FF99%s|r: %s', cmd, desc))
@@ -410,6 +490,8 @@ function Bagnon:PrintHelp()
 	PrintCmd('bank', L.CmdShowBank)
 	PrintCmd('keys', L.CmdShowKeyring)
 	PrintCmd('level', 'Toggle grouping by required level')
+	PrintCmd('badge', 'Show/hide the required level number on item icons')
+	PrintCmd('debug', 'Print diagnostic info (use this when reporting a problem)')
 	PrintCmd('version', L.CmdShowVersion)
 end
 

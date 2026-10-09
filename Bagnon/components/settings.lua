@@ -69,6 +69,19 @@ function Settings:GetHighlightOpacity()
 end
 
 
+--required level badge on each item
+function Settings:SetShowLevelBadge(enable)
+	if self:ShowingLevelBadge() ~= enable then
+		self:GetDB().showLevelBadge = enable
+		self:SendMessage('ITEM_LEVEL_BADGE_UPDATE', enable)
+	end
+end
+
+function Settings:ShowingLevelBadge()
+	return self:GetDB().showLevelBadge ~= false
+end
+
+
 --show empty item slots
 function Settings:SetShowEmptyItemSlotTexture(enable)
 	if self:ShowingEmptyItemSlotTextures() ~= enable then
